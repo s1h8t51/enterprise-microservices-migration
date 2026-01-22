@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # The Entry Point
+  api-gateway:
+    image: nginx:alpine
+    volumes:
+      - ./infrastructure/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - entitlement-service
+      - access-control
+
+  # Core Service 1: Entitlements (The 'What' users own)
+  entitlement-service:
+    build: ./services/entitlement-service
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/entitlements
+    depends_on:
+      - db
+
+  # Core Service 2: Access Control (The 'Who' can enter)
+  access-control:
+    build: ./services/access-control
+    environment:
+      - REDIS_URL=redis://cache:6379
+    depends_on:
+      - cache
+
+  # Core Service 3: Telemetry (Usage tracking)
+  telemetry-service:
+    build: ./services/telemetry-service
+    depends_on:
+      - message-broker
+
+  # Infrastructure
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+  
+  cache:
+    image: redis:7-alpine
+
+  message-broker:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672" # Management UI
