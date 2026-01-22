@@ -1,0 +1,12 @@
+enterprise-microservices-migration/
+ ├── .github/workflows/       # CI/CD Pipelines (GitHub Actions)
+ ├── architecture/            # Diagrams and ADRs (Architectural Decision Records)
+ ├── services/                # The actual microservices
+ │   ├── entitlement-service/
+ │   ├── access-control/
+ │   ├── telemetry-service/
+ │   └── licensing-service/
+ ├── infrastructure/          # Terraform or Kubernetes manifests
+ ├── scripts/                 # Migration scripts (DB sharding, data sync)
+ ├── docker-compose.yml       # For local orchestration
+ └── README.md                # The "Showcase" (The most important part)
