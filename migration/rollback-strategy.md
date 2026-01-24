@@ -1,11 +1,15 @@
-# Rollback Strategy
+# Rollback Strategy: The "Safety Net"
 
-## 1. Automated Health Checks
-If the Error Rate (5xx) exceeds 1% during a canary deployment, the Ingress controller will automatically divert 100% of traffic back to the **Legacy Monolith**.
+In an enterprise environment, "Move fast and break things" is not an option. We utilize a tiered rollback approach.
 
-## 2. Database Versioning
-* **Forward-Only Changes:** We avoid destructive schema changes (dropping columns) until the migration phase is 100% complete.
-* **Toggle:** Each service includes a `USE_LEGACY_DB` environment variable to point back to the original source if the new microservice DB desyncs.
+### Tier 1: Instant Traffic Reversion (Ingress Level)
+If the error rate exceeds 1% during a deployment, the Ingress controller is configured to instantly point traffic back to the stable legacy endpoint.
 
-## 3. Communication
-In the event of a rollback, the "On-Call" engineer must trigger the `rollback.sh` script, which resets the Kubernetes deployment to the previous `image_tag`.
+### Tier 2: Database Reconciliation
+Since we use **Dual-Writes**, the legacy database remains the "Source of Truth" during the migration. If a microservice fails, we can stop the sync and rely on the legacy DB without data loss.
+
+### Tier 3: Version Rollback (K8s)
+We maintain the last three successful container images in the registry.
+```bash
+# Emergency command to return to the previous stable state
+kubectl rollout undo deployment/entitlements-service
