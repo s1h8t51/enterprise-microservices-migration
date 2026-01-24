@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  title: Access Control API
+  version: 1.0.0
+paths:
+  /v1/validate:
+    post:
+      summary: Validate a session token
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sub: {type: string, description: "User ID"}
+                  role: {type: string}
+                  exp: {type: integer}
+        '401':
+          description: Unauthorized/Expired token
+  /v1/roles/{user_id}:
+    get:
+      summary: Get assigned roles for a user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
