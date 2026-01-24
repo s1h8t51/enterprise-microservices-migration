@@ -1,19 +1,39 @@
-from fastapi import Request, HTTPException
-import httpx
+from fastapi import Request, HTTPException, status
+from typing import Optional
+import time
 
-# The Access Control Service often acts as a gatekeeper
-async def verify_authorization(request: Request):
+class AccessControlMiddleware:
     """
-    Middleware to verify JWT and check basic access levels.
-    Demonstrates the boundary between Identity and Feature Entitlement.
+    Simulates the logic used by the API Gateway or individual services
+    to ensure the user is authenticated before hitting business logic.
     """
-    auth_header = request.headers.get("Authorization")
-    if not auth_header:
-        raise HTTPException(status_code=401, detail="Missing Auth Header")
+    async def __call__(self, request: Request, call_next):
+        token = request.headers.get("Authorization")
+        
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication credentials were not provided"
+            )
 
-    # In a real scenario, this would call the Access Control Service API
-    # or validate a signature locally.
-    if "Bearer valid-token" not in auth_header:
-        raise HTTPException(status_code=403, detail="Invalid Token")
-    
-    return True
+        # In a real system, you would decode the JWT and check the 'exp' claim
+        # Example validation logic:
+        user_info = self.decode_and_verify(token)
+        
+        if not user_info:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid or expired token"
+            )
+
+        # Inject user identity into request state for the controller to use
+        request.state.user = user_info
+        
+        response = await call_next(request)
+        return response
+
+    def decode_and_verify(self, token: str) -> Optional[dict]:
+        # Placeholder for JWT decoding logic (using PyJWT or similar)
+        if "valid-token" in token:
+            return {"uid": "user_99", "role": "admin", "tenant": "enterprise_corp"}
+        return None
