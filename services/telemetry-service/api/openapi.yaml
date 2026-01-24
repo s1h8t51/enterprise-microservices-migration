@@ -1,0 +1,30 @@
+openapi: 3.0.0
+info:
+  title: Telemetry API
+  version: 1.0.0
+paths:
+  /v1/events:
+    post:
+      summary: Ingest a new telemetry event
+      description: Used by internal services to report feature usage or system health.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [service_name, event_type, payload]
+              properties:
+                service_name: {type: string}
+                event_type: {type: string, example: "feature_access"}
+                payload: {type: object}
+                timestamp: {type: string, format: date-time}
+      responses:
+        '202':
+          description: Event accepted for processing
+  /metrics:
+    get:
+      summary: Prometheus scrape endpoint
+      responses:
+        '200':
+          description: Text-based metrics format
