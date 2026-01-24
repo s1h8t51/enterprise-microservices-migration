@@ -1,24 +1,41 @@
 import time
-from prometheus_client import start_http_server, Counter
+from fastapi import FastAPI, BackgroundTasks
+from prometheus_client import Counter, Histogram, make_asgi_app
 
-# Define custom metrics
-LICENSE_VALIDATION_TOTAL = Counter(
-    'license_validation_total', 
-    'Total number of license checks', 
-    ['status']
+app = FastAPI()
+
+# 1. Define Prometheus Metrics
+REQUEST_LATENCY = Histogram(
+    "service_request_latency_seconds", 
+    "Latency of service requests in seconds",
+    ["service_name"]
+)
+EVENT_COUNT = Counter(
+    "telemetry_events_total", 
+    "Total number of telemetry events processed",
+    ["event_type"]
 )
 
-def track_usage(status):
-    """
-    Increments the counter for Prometheus scraping.
-    """
-    LICENSE_VALIDATION_TOTAL.labels(status=status).inc()
+# 2. Add Prometheus Scrape Endpoint
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
-if __name__ == "__main__":
-    # Start Prometheus metrics endpoint
-    start_http_server(8001)
-    print("Telemetry exporter running on port 8001")
-    while True:
-        # Simulate tracking
-        track_usage(status="success")
-        time.sleep(5)
+@app.post("/v1/events", status_code=202)
+async def ingest_event(data: dict, background_tasks: BackgroundTasks):
+    """
+    Ingests events asynchronously to ensure zero impact on the calling service's latency.
+    """
+    event_type = data.get("event_type", "unknown")
+    
+    # Increment Prometheus counter
+    EVENT_COUNT.labels(event_type=event_type).inc()
+    
+    # Process the heavy lifting (DB write) in the background
+    background_tasks.add_task(process_telemetry_data, data)
+    
+    return {"status": "accepted"}
+
+def process_telemetry_data(data: dict):
+    # This is where you would write to TimescaleDB or InfluxDB
+    # print(f"Processing {data['event_type']} for {data['service_name']}")
+    time.sleep(0.01)  # Simulate DB write
