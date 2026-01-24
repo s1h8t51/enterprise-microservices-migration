@@ -1,0 +1,31 @@
+openapi: 3.0.0
+info:
+  title: Entitlements Service API
+  version: 1.0.0
+  description: Manages user feature flags and product access rights.
+paths:
+  /entitlements/{user_id}:
+    get:
+      summary: Get user entitlements
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  feature_flags:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: User not found
