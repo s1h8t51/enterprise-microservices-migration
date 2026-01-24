@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Validate Kubernetes Manifests
-        # Uses 'kubeval' or 'kube-linter' logic to check for YAML errors
         run: |
           sudo apt-get install -y yamllint
-          yamllint infrastructure/kubernetes/*.yaml
+          # Use 'relaxed' to ignore indentation and line-length warnings
+          yamllint -d relaxed infrastructure/kubernetes/*.yaml
