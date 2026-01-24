@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # The Core Database
+  postgres-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: enterprise_db
+    ports:
+      - "5432:5432"
+
+  # Entitlements Service
+  entitlements:
+    build: ./services/entitlements-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres-db
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres-db:5432/enterprise_db
+
+  # Telemetry (The High-Volume Ingester)
+  telemetry:
+    build: ./services/telemetry-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres-db
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./infrastructure/monitoring/prometheus-config.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
