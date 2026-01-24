@@ -1,3 +1,4 @@
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -5,34 +6,31 @@ metadata:
   namespace: production
   annotations:
     nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "10" # Routes 10% of traffic for testing
+    nginx.ingress.kubernetes.io/canary-weight: "10"
 spec:
   ingressClassName: nginx
   rules:
-  - host: api.enterprise.com
-    http:
-      paths:
-      # Route to New Microservice
-      - path: /api/v1/entitlements
-        pathType: Prefix
-        backend:
-          service:
-            name: entitlements-service
-            port:
-              number: 80
-      # Route to New Licensing Service
-      - path: /api/v1/licensing
-        pathType: Prefix
-        backend:
-          service:
-            name: licensing-service
-            port:
-              number: 80
-      # Default: Route everything else to the Legacy Monolith
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: legacy-monolith
-            port:
-              number: 80
+    - host: api.enterprise.com
+      http:
+        paths:
+          - path: /api/v1/entitlements
+            pathType: Prefix
+            backend:
+              service:
+                name: entitlements-service
+                port:
+                  number: 80
+          - path: /api/v1/licensing
+            pathType: Prefix
+            backend:
+              service:
+                name: licensing-service
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: legacy-monolith
+                port:
+                  number: 80
