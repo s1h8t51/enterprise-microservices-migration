@@ -1,22 +1,38 @@
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel
+from fastapi import FastAPI, Depends, HTTPException
+from typing import List
+import os
 
-app = FastAPI(title="Entitlements Service")
+app = FastAPI()
 
-class Entitlement(BaseModel):
-    user_id: str
-    feature_flags: list[str]
+# In a real scenario, these would be fetched from a DB/Cache
+MOCK_DATA = {
+    "user_1": ["dashboard_view", "basic_reports"],
+    "user_2": ["dashboard_view", "advanced_analytics", "export_csv"]
+}
 
-# Mock Database
-db = {"user_123": ["premium_access", "api_export"]}
-
-@app.get("/entitlements/{user_id}", response_model=Entitlement)
-async def get_user_entitlements(user_id: str):
+@app.get("/v1/users/{user_id}/features")
+async def get_features(user_id: str):
     """
-    Retrieves specific feature permissions for a given user.
-    Migrated from the monolithic 'UserPermissions' module.
+    Business Logic: Checks the user's current entitlements.
+    Integration point for the 'Strangler Fig' pattern.
     """
-    if user_id not in db:
-        raise HTTPException(status_code=404, detail="User not found")
+    # 1. Check local cache (Redis)
+    # 2. Fallback to Database if cache miss
+    features = MOCK_DATA.get(user_id)
     
-    return {"user_id": user_id, "feature_flags": db[user_id]}
+    if not features:
+        raise HTTPException(status_code=404, detail="User entitlements not found")
+        
+    return {
+        "user_id": user_id,
+        "features": features,
+        "environment": os.getenv("APP_ENV", "production")
+    }
+
+@app.post("/v1/internal/refresh-cache")
+async def refresh_cache(user_id: str):
+    """
+    Triggered by an Event Consumer when a license is upgraded.
+    """
+    # Logic to invalidate Redis would go here
+    return {"status": "cache_invalidated", "user_id": user_id}
