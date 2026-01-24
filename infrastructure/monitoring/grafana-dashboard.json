@@ -1,0 +1,30 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Migration Health Overview",
+    "panels": [
+      {
+        "title": "Request Volume per Service",
+        "type": "graph",
+        "targets": [
+          { "expr": "sum(rate(http_requests_total[5m])) by (service_name)" }
+        ]
+      },
+      {
+        "title": "Error Rate (5xx)",
+        "type": "stat",
+        "targets": [
+          { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))" }
+        ],
+        "thresholds": {
+          "steps": [
+            { "color": "green", "value": null },
+            { "color": "red", "value": 0.01 }
+          ]
+        }
+      }
+    ],
+    "schemaVersion": 26,
+    "version": 1
+  }
+}
