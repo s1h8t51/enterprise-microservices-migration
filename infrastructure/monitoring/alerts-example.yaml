@@ -1,11 +1,23 @@
 groups:
-- name: enterprise-alerts
+- name: enterprise-service-alerts
   rules:
+  # Alert if any service has a high failure rate
   - alert: HighErrorRate
-    expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.01
+    expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.02
     for: 2m
     labels:
       severity: critical
+      team: backend
     annotations:
-      summary: "High error rate on {{ $labels.instance }}"
-      description: "Service is returning >1% errors for more than 2 minutes."
+      summary: "High Error Rate on {{ $labels.service_name }}"
+      description: "Service is returning >2% errors for more than 2 minutes. Immediate rollback may be required."
+
+  # Alert if service latency exceeds 500ms
+  - alert: SlowResponseTime
+    expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service_name)) > 0.5
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Latency spike on {{ $labels.service_name }}"
+      description: "95th percentile latency is above 500ms."
