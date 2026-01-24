@@ -1,0 +1,34 @@
+openapi: 3.0.0
+info:
+  title: Licensing API
+  version: 1.0.0
+paths:
+  /v1/licenses:
+    post:
+      summary: Issue a new license key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer_id, plan_id]
+              properties:
+                customer_id: {type: string}
+                plan_id: {type: string, enum: [basic, pro, enterprise]}
+                duration_days: {type: integer, default: 365}
+      responses:
+        '201':
+          description: License created
+  /v1/licenses/{license_id}/validate:
+    get:
+      summary: Check if a specific license is active and valid
+      parameters:
+        - name: license_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Validation result
