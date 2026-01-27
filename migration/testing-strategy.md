@@ -1,6 +1,5 @@
+----
 ## 3. Testing Strategy: `migration/testing-strategy.md`
-
-
 
 ```markdown
 # Testing Strategy for Distributed Systems
