@@ -275,7 +275,7 @@ The key is identifying **bounded contexts** and accepting **eventual consistency
 ## 📞 Contact
 
 **Sahitya Gantala**
-- LinkedIn: [your-profile]
+- LinkedIn: [(https://www.linkedin.com/in/sahitya-gantala-7ab647113/)]
 - Email: sahityagantalausa@gmail.com
-- Portfolio: [other projects]
+- Portfolio: [s1h8t51.github.io/portfolio/]
 
