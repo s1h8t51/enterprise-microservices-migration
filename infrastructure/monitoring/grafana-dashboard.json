@@ -5,26 +5,40 @@
     "panels": [
       {
         "title": "Request Volume per Service",
-        "type": "graph",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
         "targets": [
-          { "expr": "sum(rate(http_requests_total[5m])) by (service_name)" }
+          { 
+            "expr": "sum(rate(http_requests_total[5m])) by (service_name)",
+            "legendFormat": "{{service_name}}"
+          }
         ]
       },
       {
-        "title": "Error Rate (5xx)",
+        "title": "Service Error Rate (5xx %)",
         "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
         "targets": [
-          { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))" }
+          { 
+            "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service_name) / sum(rate(http_requests_total[5m])) by (service_name)",
+            "legendFormat": "{{service_name}}"
+          }
         ],
-        "thresholds": {
-          "steps": [
-            { "color": "green", "value": null },
-            { "color": "red", "value": 0.01 }
-          ]
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "red", "value": 0.01 }
+              ]
+            }
+          }
         }
       }
     ],
-    "schemaVersion": 26,
+    "schemaVersion": 30,
     "version": 1
   }
 }
