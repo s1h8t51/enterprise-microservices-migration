@@ -1,10 +1,10 @@
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: enterprise-gateway
   namespace: production
   annotations:
+    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "10"
 spec:
@@ -25,12 +25,5 @@ spec:
             backend:
               service:
                 name: licensing-service
-                port:
-                  number: 80
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: legacy-monolith
                 port:
                   number: 80
