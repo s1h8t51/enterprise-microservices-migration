@@ -2,7 +2,7 @@
 
 > A comprehensive case study of migrating a monolithic enterprise platform to domain-driven microservices architecture, achieving 40% performance improvement and 99.9% uptime.
 
-![Architecture Overview](docs/diagrams/microservices-after.png)
+
 ![CI Status](https://github.com/s1h8t51/enterprise-microservices-migration/actions/workflows/ci-pipeline.yml/badge.svg)
 
 ## Project Status: 🟢 Production Ready (Simulated)
