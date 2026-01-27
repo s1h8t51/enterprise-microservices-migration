@@ -1,3 +1,4 @@
+----
 # Zero-Downtime Approach
 
 Our goal was a 100% availability migration. We achieved this through three primary technical implementations:
