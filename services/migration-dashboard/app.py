@@ -1,48 +1,32 @@
 import streamlit as st
 import requests
-import pandas as pd
-import time
 
-st.set_page_config(page_title="Migration Control Center", layout="wide")
-
-st.title("🚀 Enterprise Microservices Migration Dashboard")
-st.markdown("---")
-
-# --- Service Status Logic ---
-services = {
-    "Access Control": "http://localhost:8000",
-    "Entitlements": "http://localhost:8001",
-    "Licensing": "http://localhost:8002",
-    "Telemetry": "http://localhost:8003"
+# Dictionary of your services and their "Website" (Documentation) URLs
+# Use 127.0.0.1 for local testing, or your public Cloud URL for deployment
+service_links = {
+    "Access Control": "http://127.0.0.1:8000/docs",
+    "Entitlements": "http://127.0.0.1:8001/docs",
+    "Licensing": "http://127.0.0.1:8002/docs",
+    "Telemetry": "http://127.0.0.1:8003/docs"
 }
 
-cols = st.columns(len(services))
+st.title("🚀 Enterprise Migration Control Center")
+st.write("Click on a service name to view its API Documentation.")
 
-for i, (name, url) in enumerate(services.items()):
+cols = st.columns(len(service_links))
+
+for i, (name, url) in enumerate(service_links.items()):
     with cols[i]:
+        # This creates a clickable header
+        st.markdown(f"### [{name}]({url})")
+        
         try:
-            # Try to hit the real service
-            res = requests.get(url, timeout=0.5)
-            status = "ONLINE" if res.status_code < 500 else "ERROR"
-            st.success(f"**{name}**\n\n{status}")
+            # Check if the site is actually up
+            # We use a 0.5s timeout so the dashboard doesn't lag
+            res = requests.get(url.replace("/docs", ""), timeout=0.5) 
+            if res.status_code < 400:
+                st.success("Status: ONLINE")
+            else:
+                st.warning(f"Status: {res.status_code}")
         except:
-            # Fallback to Demo Mode so it looks good for recruiters
-            st.info(f"**{name}**\n\nDEMO MODE")
-
-st.markdown("### 📊 Migration Performance Metrics")
-
-# Mock data for charts
-chart_data = pd.DataFrame({
-    "Service": list(services.keys()),
-    "Latency (ms)": [45, 120, 85, 30],
-    "Uptime (%)": [99.9, 98.5, 99.2, 100.0]
-})
-
-col_a, col_b = st.columns(2)
-with col_a:
-    st.bar_chart(chart_data.set_index("Service")["Latency (ms)"])
-    st.caption("Average Request Latency (Target: <200ms)")
-
-with col_b:
-    st.line_chart([0.1, 0.2, 0.1, 0.5, 0.2, 0.1])
-    st.caption("Error Rate (%) - 24hr Window")
+            st.error("Status: OFFLINE")
