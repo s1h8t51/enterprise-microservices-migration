@@ -1,18 +1,29 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Enterprise Migration API Docs</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
-
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration API Portal</title>
     <style>
-      body { margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 600px; }
+        h1 { color: #2c3e50; margin-bottom: 0.5rem; }
+        p { color: #7f8c8d; margin-bottom: 2rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .card { padding: 1.5rem; border: 1px solid #e0e0e0; border-radius: 8px; text-decoration: none; color: #34495e; transition: all 0.3s ease; font-weight: bold; }
+        .card:hover { background-color: #3498db; color: white; border-color: #3498db; transform: translateY(-5px); }
     </style>
-  </head>
-  <body>
-    <redoc spec-url='https://raw.githubusercontent.com/s1h8t51/enterprise-microservices-migration/main/services/entitlements-service/api/openapi.yaml'></redoc>
-
-    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
-  </body>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Microservices API Portal</h1>
+        <p>Select a service to view its technical documentation and endpoint specifications.</p>
+        <div class="grid">
+            <a href="./entitlements-docs.html" class="card">Entitlements Service</a>
+            <a href="#" class="card">Licensing Service</a>
+            <a href="#" class="card">Telemetry Service</a>
+            <a href="#" class="card">Access Control</a>
+        </div>
+    </div>
+</body>
 </html>
