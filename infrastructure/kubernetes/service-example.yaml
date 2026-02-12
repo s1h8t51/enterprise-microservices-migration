@@ -1,13 +1,21 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: entitlements-service
-  namespace: production
+  name: licensing-suite-service
 spec:
   selector:
-    app: entitlements
+    app: licensing-suite
   ports:
-    - protocol: TCP
+    - name: entitlements-port
+      protocol: TCP
       port: 80
-      targetPort: 8000
+      targetPort: 8080
+    - name: licensing-port
+      protocol: TCP
+      port: 81
+      targetPort: 8081
+    - name: telemetry-port
+      protocol: TCP
+      port: 90
+      targetPort: 9090
   type: ClusterIP
