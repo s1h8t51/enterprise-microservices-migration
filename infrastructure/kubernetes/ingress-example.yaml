@@ -1,29 +1,32 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: enterprise-gateway
-  namespace: production
+  name: licensing-suite-ingress
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "10"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
   rules:
-    - host: api.enterprise.com
+    - host: api.yourcompany.com
       http:
         paths:
-          - path: /api/v1/entitlements
+          - path: /entitlements
             pathType: Prefix
             backend:
               service:
-                name: entitlements-service
+                name: licensing-suite-service
                 port:
                   number: 80
-          - path: /api/v1/licensing
+          - path: /licensing
             pathType: Prefix
             backend:
               service:
-                name: licensing-service
+                name: licensing-suite-service
                 port:
-                  number: 80
+                  number: 81
+          - path: /telemetry
+            pathType: Prefix
+            backend:
+              service:
+                name: licensing-suite-service
+                port:
+                  number: 90
