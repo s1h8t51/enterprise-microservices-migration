@@ -1,33 +1,51 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: entitlements-service
-  namespace: production
+  name: cloud-services-deployment
+  labels:
+    app: licensing-suite
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
-      app: entitlements
+      app: licensing-suite
   template:
     metadata:
       labels:
-        app: entitlements
+        app: licensing-suite
     spec:
       containers:
-      - name: entitlements-api
-        image: enterprise/entitlements-service:1.2.0
-        ports:
-        - containerPort: 8000
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
-            memory: "256Mi"
-        livenessProbe:
-          httpGet:
-            path: /metrics
-            port: 8000
-          initialDelaySeconds: 15
-          periodSeconds: 10
+        # 1. Entitlements Service
+        - name: entitlements-service
+          image: entitlements-api:v1.2.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVICE_NAME
+              value: "entitlements"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+
+        # 2. Licensing Service
+        - name: licensing-service
+          image: licensing-api:v1.1.0
+          ports:
+            - containerPort: 8081
+          env:
+            - name: ENTITLEMENTS_URL
+              value: "http://localhost:8080"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+
+        # 3. Telemetry Collector (Sidecar or standalone)
+        - name: telemetry-collector
+          image: telemetry-agent:latest
+          ports:
+            - containerPort: 9090
+          env:
+            - name: SCRAPE_INTERVAL
+              value: "30s"
